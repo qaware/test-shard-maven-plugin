@@ -4,6 +4,8 @@
 
 package com.telekom.gis.psa.test.shard.maven.plugin;
 
+import org.apache.maven.plugin.logging.Log;
+
 import java.io.File;
 import java.io.FileFilter;
 import java.io.FilenameFilter;
@@ -33,14 +35,16 @@ public class TestFileReader {
      * Reads the files in the given folders and converts their name to [package].[file] without file ending. This is
      * necessary, so surefire can read the shards properly.
      *
+     * @param log
      * @param pathToPackage the directory to the package begin, e.g "src/test/java" (afterwards the package name starts.
      * @param testFolderPaths the test folders
      */
-    public void read(String pathToPackage, String... testFolderPaths){
+    public void read(Log log, String pathToPackage, String... testFolderPaths){
         Map<String, File> testFolders = new HashMap<>();
         for(String testFolderPath : testFolderPaths){
             File fileFolder = new File(testFolderPath);
             if(!fileFolder.exists() || !fileFolder.isDirectory()){
+                log.warn("Invalid test folder: " + fileFolder.getPath());
                 continue;
             }
             addSubFoldersOf(fileFolder, testFolders);
@@ -90,7 +94,7 @@ public class TestFileReader {
     }
 
     /**
-     * Return all found test file paths. {@link TestFileReader#read(String, String...)} must be invoked first, otherwise it
+     * Return all found test file paths. {@link TestFileReader#read(Log, String, String...)} must be invoked first, otherwise it
      * will always return an empty list
      *
      * @return a list with test file paths ([package].[file]) without file ending

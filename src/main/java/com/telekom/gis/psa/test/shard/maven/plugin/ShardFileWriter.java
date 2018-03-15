@@ -43,7 +43,7 @@ public class ShardFileWriter {
         }
 
         if(!outputFolder.isDirectory() && !outputFolder.mkdirs()){
-            throw new MojoFailureException("Failed to create output folder.");
+            throw new MojoFailureException("Failed to create output folder (" + outputFolder.getAbsolutePath() + ").");
         }
 
         this.outputFolderPath = outputFolderPath;

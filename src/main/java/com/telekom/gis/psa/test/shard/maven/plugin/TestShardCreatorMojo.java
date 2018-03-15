@@ -48,15 +48,15 @@ public class TestShardCreatorMojo extends AbstractTestShardMojo {
     public void execute() throws MojoExecutionException, MojoFailureException {
         writer.clear();
         reader.setFilenameFilter(new TestClassFileFilter(includes, excludes));
-
+        
         if (testFolders == null || testFolders.length == 0) {
-            reader.read(getTestSources());
+            reader.read(getLog(), getTestSources());
         } else {
-            reader.read(pathToPackage, testFolders);
+            reader.read(getLog(), pathToPackage, testFolders);
         }
 
         List<String> testClassList = reader.getTestFilePaths();
-        if (testClassList.size() <= 0) {
+        if (testClassList.isEmpty()) {
             throw new MojoExecutionException("Failed to load test classes, no classes found.");
         }
         getLog().info("Test files loaded, found " + testClassList.size() + " test(s) to split into " +
