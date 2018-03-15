@@ -1,0 +1,31 @@
+variables:
+  MAVEN_OPTS: "-Dmaven.repo.local=.m2/repository -Djava.awt.headless=true"
+  MAVEN_CLI_OPTS: "--fail-at-end -B -s .m2/settings.xml"
+
+stages:
+  - prepare
+  - build
+  - deploy
+
+
+download-dependencies:
+  image: maven:3.5-jdk-8
+  stage: prepare
+  script:
+    - 'mvn $MAVEN_CLI_OPTS -Dsilent=true org.apache.maven.plugins:maven-dependency-plugin:3.0.2:go-offline'
+  cache:
+    paths:
+      - .m2/repository
+
+build_and_deploy:
+  stage: build
+  image: maven:3.5-jdk-8
+  script:
+    - 'mvn $MAVEN_CLI_OPTS deploy -Drat.skip=true'
+  cache:
+    paths:
+      - .m2/repository
+    policy: pull
+  artifacts:
+     paths:
+      - 'target/maven-dependency-plugin-*.jar'

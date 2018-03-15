@@ -1,6 +1,8 @@
 #Target folder
 **/target
+/test-shards
+/${env.M3_REPO}
 
 #IDE settings
 **/.idea
-*.impl
+*.iml

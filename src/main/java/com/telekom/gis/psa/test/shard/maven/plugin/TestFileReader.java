@@ -73,7 +73,7 @@ public class TestFileReader {
     private void addTestFilePathsIn(String pathToPackage, String path, File dir, List<String> testFilePaths){
         String[] filePathArray = dir.list(filenameFilter);
         for (String filePath : filePathArray) {
-            int i = filePath.lastIndexOf(".");
+            int i = filePath.lastIndexOf('.');
             if(i > 0) {
                 filePath = filePath.substring(0, i);
             }
@@ -86,13 +86,12 @@ public class TestFileReader {
         if(index <= pathToPackage.length()){
             return path;
         }
-        path = path.substring(index).replaceAll("[\\\\/]", ".");
-        return path;
+        return path.substring(index).replaceAll("[\\\\/]", ".");
     }
 
     /**
      * Return all found test file paths. {@link TestFileReader#read(String, String...)} must be invoked first, otherwise it
-     * will always retrun an empty list
+     * will always return an empty list
      *
      * @return a list with test file paths ([package].[file]) without file ending
      */

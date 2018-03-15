@@ -37,9 +37,12 @@ public class TestShardUnitTest {
 
         //Creator properties
         properties.put("shardCount", 5);
-        properties.put("includes", new String[]{"**/*Test.java"});
-        properties.put("testFolders", new String[]{
-                "P:\\codebase\\code\\test\\integration-tests\\src\\test\\java\\com\\telekom\\gis\\psa\\itest"});
+        properties.put("includes", new String[]{"**/*Test*.java"});
+
+        String testFolder = TestShardUnitTest.class.getClassLoader().getResource("testClasses").getFile();
+        testFolder = testFolder.replaceAll("%20", " ");
+
+        properties.put("testFolders", new String[]{testFolder});
         properties.put("pathToPackage", "src\\test\\java");
 
         testShardCreatorMojo = new TestShardCreatorMojo();
@@ -47,6 +50,8 @@ public class TestShardUnitTest {
 
         testShardCleanerMojo = new TestShardCleanerMojo();
         loadMojo(testShardCleanerMojo);
+
+        testShardCleanerMojo.execute();
     }
 
     private static void loadMojo(Object mojo) throws Exception {
@@ -70,7 +75,7 @@ public class TestShardUnitTest {
     @Test
     public void testTestShardCreator() throws MojoFailureException, MojoExecutionException {
         testShardCreatorMojo.execute();
-        Assert.assertEquals(5, testShardCreatorMojo.getReader().getTestFilePaths().size());
+        Assert.assertEquals(10, testShardCreatorMojo.getReader().getTestFilePaths().size());
 
         File file = new File("test-shards");
         Assert.assertTrue(file.isDirectory());
@@ -82,7 +87,7 @@ public class TestShardUnitTest {
         testShardCleanerMojo.execute();
 
         File file = new File("test-shards");
-        if(file.isDirectory()){
+        if (file.isDirectory()) {
             Assert.assertTrue(file.list((dir, name) -> name.startsWith("shard") && name.endsWith(".txt")).length == 0);
             Assert.assertTrue(file.delete());
         }
