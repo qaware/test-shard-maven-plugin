@@ -1,0 +1,52 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <groupId>com.telekom.gis.psa</groupId>
+    <artifactId>test-shard-maven-plugin-test</artifactId>
+    <version>1.0-SNAPSHOT</version>
+    <packaging>jar</packaging>
+    <name>Test Shard Maven Plugin Test</name>
+
+    <dependencies>
+        <dependency>
+            <groupId>junit</groupId>
+            <artifactId>junit</artifactId>
+            <version>RELEASE</version>
+            <scope>test</scope>
+        </dependency>
+    </dependencies>
+
+    <build>
+        <plugins>
+            <plugin>
+                <artifactId>test-shard-maven-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <id>test</id>
+                        <goals>
+                            <goal>shard-creator</goal>
+                            <goal>shard-include</goal>
+                            <goal>shard-clean</goal>
+                        </goals>
+                    </execution>
+                </executions>
+                <configuration>
+                    <includes>
+                        <include>**/PSACucumberItests*.java</include>
+                    </includes>
+                    <excludes>
+                        <exclude>**/PSACucumberItests1.java</exclude>
+                    </excludes>
+                    <testFolders>
+                        <testFolder>P:/codebase/code/test/integration-tests/src</testFolder>
+                    </testFolders>
+                    <shardCount>1</shardCount>
+                    <outputFolder>target/test-shards</outputFolder>
+                    <pathToPackage>src/test/java</pathToPackage>
+                </configuration>
+            </plugin>
+        </plugins>
+    </build>
+</project>
