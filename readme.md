@@ -1,6 +1,6 @@
 # Test Shard Maven Plugin
 
-The test shard maven plugin is a maven plugin to split tests into test shards (txt files). The main aim is to use these shards for synchronous testing. The plugin reads all test classes, splits the into a given amount of
+The test shard maven plugin is a maven plugin to split tests into test shards (txt files). The main aim is to use these shards for concurrent testing. The plugin reads all test classes, splits them into a given amount of
 test shards in the the maven process-test-resources life-cycle phase. These shards can be included into surfire maven plugin by running the shard-include goal of this plugin. 
 
 ## Getting started
@@ -81,7 +81,7 @@ Name | Parameter property | description | goal | example | default value
 outputFolder | tests.outputFolder | The output directory for the test shards | shard-creator, shard-include, shard-clean | `<outputFolder>target/test-shards</outputFolder>` | `${project.build.directory}/test-shards`
 shardCount | tests.shardCount | The amount of shards to be created | shard-creator | `<shardCount>5</shardCount>` |
 includes | tests.includes | The path pattern for the test files to be included | shard-creator | `<excludes><exclude>**/*Test.java</exclude></excludes>` | `**/*Test.java`
-excludes | tests.excludes | The path pattern for the test files to be excluded | shard-creator | `<excludes><exclude>**/*NoTest.java</exclude></excludes>` | none
+excludes | tests.excludes | The path pattern for the test files to be excluded | shard-creator | `<excludes><exclude>**/*NoTest.java</exclude></excludes>` | []
 testFolders | tests.testFolders | The directories, where to search for the the test files | shard-creator | `<testFolders><testFolder>src/test/java</testFolder></testFolders>` | `${project.build.testSourceDirectory}`
 shardIndex | tests.shardIndex | The index of the shard to be loaded into surfire (0 <= shardIndex < shardCount) | shard-include | `-Dtests.shardIndex=1` | 
 
