@@ -1,0 +1,6 @@
+#Target folder
+**/target
+
+#IDE settings
+**/.idea
+*.impl

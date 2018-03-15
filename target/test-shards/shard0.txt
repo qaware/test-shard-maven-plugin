@@ -1,2 +1,0 @@
-P:\codebase\code\test\integration-tests\src\test\java\com\telekom\gis\psa\itest.PSACucumberItests
-P:\codebase\code\test\integration-tests\src\test\java\com\telekom\gis\psa\itest.PSACucumberItests2
