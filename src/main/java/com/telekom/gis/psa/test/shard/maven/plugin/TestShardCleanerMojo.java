@@ -12,7 +12,8 @@ import org.apache.maven.plugins.annotations.Mojo;
 import java.io.File;
 
 /**
- * The cleaner mojo: deletes all files in shard*.txt files in the output folder
+ * The cleaner mojo: deletes all test shards in the output folder. The mojo should be executed when the amount
+ * of shards is decreased.
  *
  * @author Patrick Fischer patrick.fischer@qaware.de
  */
