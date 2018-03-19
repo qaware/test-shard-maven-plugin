@@ -44,7 +44,7 @@ public class TestFileReader {
         for(String testFolderPath : testFolderPaths){
             File fileFolder = new File(testFolderPath);
             if(!fileFolder.exists() || !fileFolder.isDirectory()){
-                log.warn("Invalid test folder: " + fileFolder.getPath());
+                log.warn("Invalid test folder: " + fileFolder.getAbsolutePath());
                 continue;
             }
             addSubFoldersOf(fileFolder, testFolders);
