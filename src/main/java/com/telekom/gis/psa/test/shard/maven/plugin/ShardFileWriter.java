@@ -22,27 +22,30 @@ public class ShardFileWriter {
 
     private String outputFolderPath;
     private List<String> testClasses;
-    private File file;
     private FileWriter writer;
 
-    public ShardFileWriter(){
+    /**
+     * Default constructor, initializes not nullable field
+     */
+    public ShardFileWriter() {
         this.testClasses = new ArrayList<>();
     }
 
     /**
      * Creates the output folder, if it does not exist
+     *
      * @param outputFolderPath the output folder path
      * @throws MojoExecutionException if the output folder exits but is not a directory
-     * @throws MojoFailureException if the output folder could not be created
+     * @throws MojoFailureException   if the output folder could not be created
      */
     public void createOutputFolder(String outputFolderPath) throws MojoExecutionException, MojoFailureException {
         File outputFolder = new File(outputFolderPath);
 
-        if(outputFolder.exists() && !outputFolder.isDirectory()) {
+        if (outputFolder.exists() && !outputFolder.isDirectory()) {
             throw new MojoExecutionException("Invalid output folder: \"" + outputFolderPath + "\" is not a directory.");
         }
 
-        if(!outputFolder.isDirectory() && !outputFolder.mkdirs()){
+        if (!outputFolder.isDirectory() && !outputFolder.mkdirs()) {
             throw new MojoFailureException("Failed to create output folder (" + outputFolder.getAbsolutePath() + ").");
         }
 
@@ -51,14 +54,17 @@ public class ShardFileWriter {
 
     /**
      * Opens a shard file and prepares the writer for writing
+     *
      * @param shardName the shard name
      * @throws IOException
      */
     public void openShardFile(String shardName) throws IOException {
-        file = new File(outputFolderPath + File.separator + shardName);
+        File file = new File(outputFolderPath + File.separator + shardName);
 
-        if(!file.exists()){
-            file.createNewFile();
+        if (!file.exists()) {
+            if(!file.createNewFile()){
+                throw new IOException("Failed to create the shard file. Check if the folder exists.");
+            }
         }
 
         writer = new FileWriter(file);
@@ -67,22 +73,24 @@ public class ShardFileWriter {
 
     /**
      * Adds all test classes to a list (not saved to file)
-     * @see ShardFileWriter#saveAndClose() 
+     *
      * @param testClasses the test classes
+     * @see ShardFileWriter#saveAndClose()
      */
-    public void addTestClass(String... testClasses){
-        for(String testClass : testClasses){
+    public void addTestClass(String... testClasses) {
+        for (String testClass : testClasses) {
             addTestClass(testClass);
         }
     }
 
     /**
      * Adds a test class to a list (not saved to file)
-     * @see ShardFileWriter#saveAndClose()
+     *
      * @param testClass the test classe
+     * @see ShardFileWriter#saveAndClose()
      */
-    public void addTestClass(String testClass){
-        if(testClasses.contains(testClass)){
+    public void addTestClass(String testClass) {
+        if (testClasses.contains(testClass)) {
             return;
         }
         testClasses.add(testClass);
@@ -90,10 +98,11 @@ public class ShardFileWriter {
 
     /**
      * Saves the temporary test class list to the opened file
+     *
      * @throws IOException
      */
     public void saveAndClose() throws IOException {
-        for(String line : testClasses){
+        for (String line : testClasses) {
             writer.write(line + System.getProperty("line.separator"));
         }
         writer.flush();

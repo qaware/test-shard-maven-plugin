@@ -20,6 +20,7 @@ public class TestClassFileFilter implements FileFilter, FilenameFilter {
 
     /**
      * Default constructor
+     * 
      * @param includes list from the pom
      * @param excludes list from the pom
      */
@@ -33,12 +34,25 @@ public class TestClassFileFilter implements FileFilter, FilenameFilter {
             this.excludes = excludes;
         }
     }
-    
+
+    /**
+     * Checks if a given file matches the include file pattern and does not match the exclude file pattern
+     *
+     * @param file the file to check
+     * @return true if the file should be accepted
+     */
     @Override
     public boolean accept(File file) {
         return file.exists() && !file.isDirectory() && accept(file.getAbsoluteFile().getParentFile(), file.getName());
     }
 
+    /**
+     * Checks if a given file matches the include file pattern and does not match the exclude file pattern
+     *
+     * @param dir the directory of the file
+     * @param name the file name
+     * @return true if the file should be accepted
+     */
     @Override
     public boolean accept(File dir, String name) {
         String dirPath = dir.getAbsolutePath().toLowerCase();
@@ -77,7 +91,7 @@ public class TestClassFileFilter implements FileFilter, FilenameFilter {
         pattern = pattern.replaceAll("\\\\", "/");
 
         if (pattern.contains("/")) {
-            if (!matchDirectoryPath(dirPath, pattern.substring(0, pattern.lastIndexOf("/")))) {
+            if (!matchDirectoryPath(dirPath, pattern.substring(0, pattern.lastIndexOf('/')))) {
                 return false;
             }
 
@@ -85,7 +99,7 @@ public class TestClassFileFilter implements FileFilter, FilenameFilter {
                 return true;
             }
 
-            pattern = pattern.substring(pattern.lastIndexOf("/") + 1);
+            pattern = pattern.substring(pattern.lastIndexOf('/') + 1);
         }
         return matchString(name, pattern);
     }

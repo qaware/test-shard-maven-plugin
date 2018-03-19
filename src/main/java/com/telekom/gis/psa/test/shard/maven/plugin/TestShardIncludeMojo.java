@@ -25,6 +25,12 @@ public class TestShardIncludeMojo extends AbstractTestShardMojo{
     @Parameter(property = "tests.shardIndex", required = true)
     private int shardIndex;
 
+    /**
+     * The execution function for this goal.
+     *
+     * @throws MojoFailureException if something wrong with the dependencies or sources of a the plugin
+     * @throws MojoExecutionException if there is a problem in the properties
+     */
     @Override
     public void execute() throws MojoExecutionException, MojoFailureException {
         List<String> testShardPath = getTestShards();

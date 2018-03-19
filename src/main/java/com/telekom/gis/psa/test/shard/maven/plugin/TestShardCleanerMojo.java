@@ -18,6 +18,12 @@ import java.io.File;
 @Mojo(name = "shard-clean")
 public class TestShardCleanerMojo extends AbstractTestShardMojo {
 
+    /**
+     * The execution function for this goal.
+     *
+     * @throws MojoFailureException   if something wrong with the dependencies or sources of a the plugin
+     * @throws MojoExecutionException if there is a problem in the properties
+     */
     @Override
     public void execute() throws MojoExecutionException, MojoFailureException {
         File folder = new File(outputFolder);
@@ -26,7 +32,9 @@ public class TestShardCleanerMojo extends AbstractTestShardMojo {
         }
 
         for (File file : folder.listFiles((dir, name) -> name.startsWith("shard") && name.endsWith(".txt"))) {
-            file.delete();
+            if(file.delete()){
+                getLog().warn("Failed to delete test shard: " + file.getPath());
+            }
         }
         getLog().info("Deleted all test shards");
     }

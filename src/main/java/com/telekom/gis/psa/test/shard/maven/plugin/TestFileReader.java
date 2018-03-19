@@ -25,7 +25,7 @@ public class TestFileReader {
     private FilenameFilter filenameFilter;
 
     /**
-     * Default constructor
+     * Default constructor, initializes some not nullable fields
      */
     public TestFileReader(){
         this.testFilePaths = new ArrayList<>();
@@ -35,7 +35,7 @@ public class TestFileReader {
      * Reads the files in the given folders and converts their name to [package].[file] without file ending. This is
      * necessary, so surefire can read the shards properly.
      *
-     * @param log
+     * @param log the Logger to print warnings to the console
      * @param pathToPackage the directory to the package begin, e.g "src/test/java" (afterwards the package name starts.
      * @param testFolderPaths the test folders
      */

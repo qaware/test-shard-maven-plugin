@@ -40,11 +40,21 @@ public class TestShardCreatorMojo extends AbstractTestShardMojo {
     @Parameter(property = "tests.pathToPackage", defaultValue = "java")
     private String pathToPackage;
 
-    public TestShardCreatorMojo() throws IOException {
+    /**
+     * Default constructor, initializes a reader for the test classes and a writer for the test shards.
+     */
+    public TestShardCreatorMojo() {
         writer = new ShardFileWriter();
         reader = new TestFileReader();
     }
 
+    /**
+     * The execution function for this goal.
+     *
+     * @throws MojoFailureException if something wrong with the dependencies or sources of a the plugin
+     * @throws MojoExecutionException if there is a problem in the properties
+     */
+    @Override
     public void execute() throws MojoExecutionException, MojoFailureException {
         writer.clear();
         reader.setFilenameFilter(new TestClassFileFilter(includes, excludes));
@@ -146,6 +156,7 @@ public class TestShardCreatorMojo extends AbstractTestShardMojo {
 
     /**
      * Getter for the test file reader
+     * 
      * @return the test file reader
      */
     public TestFileReader getReader() {

@@ -31,7 +31,7 @@ To include this plugin just add, it to the pom.xml of your project.
                         <exclude>**/*NoTest.java</exclude>
                     </excludes>
                     <testFolders>
-                        <testFolder>src/test/java</testFolder>
+                        <testFolder>#{basedir}/src/test/java</testFolder>
                     </testFolders>
                     <shardCount>5</shardCount>
                     <outputFolder>target/test-shards</outputFolder>
@@ -82,6 +82,5 @@ outputFolder | tests.outputFolder | The output directory for the test shards | s
 shardCount | tests.shardCount | The amount of shards to be created | shard-creator | `<shardCount>5</shardCount>` |
 includes | tests.includes | The path pattern for the test files to be included | shard-creator | `<excludes><exclude>**/*Test.java</exclude></excludes>` | `**/*Test.java`
 excludes | tests.excludes | The path pattern for the test files to be excluded | shard-creator | `<excludes><exclude>**/*NoTest.java</exclude></excludes>` | []
-testFolders | tests.testFolders | The directories, where to search for the the test files | shard-creator | `<testFolders><testFolder>src/test/java</testFolder></testFolders>` | `${project.build.testSourceDirectory}`
-shardIndex | tests.shardIndex | The index of the shard to be loaded into surfire (0 <= shardIndex < shardCount) | shard-include | `-Dtests.shardIndex=1` | 
-
+testFolders | tests.testFolders | The directories, where to search for the the test files, do not include parts of package names | shard-creator | `<testFolders><testFolder>src/test/java</testFolder></testFolders>` | `${project.build.testSourceDirectory}`
+shardIndex | tests.shardIndex | The index of the shard to be loaded into surfire (0 <= shardIndex < shardCount) | shard-include | `-Dtests.shardIndex=1` |

@@ -11,11 +11,11 @@ import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
+import java.io.File;
 import java.io.IOException;
 import java.lang.reflect.Field;
 import java.util.HashMap;
 import java.util.Map;
-import java.io.File;
 
 /**
  * Unit test for test shard mojo, just tests for java exceptions and basic result
@@ -29,6 +29,11 @@ public class TestShardUnitTest {
     private static TestShardIncludeMojo testShardIncludeMojo;
     private static TestShardCleanerMojo testShardCleanerMojo;
 
+    /**
+     * Creates the needed mojos and loads the default properties.
+     *
+     * @throws Exception if an Exception occurs
+     */
     @BeforeClass
     public static void loadProperties() throws Exception {
         properties = new HashMap<>();
@@ -72,16 +77,12 @@ public class TestShardUnitTest {
         }
     }
 
-    @Test
-    public void testTestShardCreator() throws MojoFailureException, MojoExecutionException {
-        testShardCreatorMojo.execute();
-        Assert.assertEquals(10, testShardCreatorMojo.getReader().getTestFilePaths().size());
-
-        File file = new File("test-shards");
-        Assert.assertTrue(file.isDirectory());
-        Assert.assertTrue(file.list((dir, name) -> name.startsWith("shard") && name.endsWith(".txt")).length == 5);
-    }
-
+    /**
+     * Cleans up everything and in doing so, it tests the clean goal
+     *
+     * @throws MojoFailureException if something wrong with the dependencies or sources of a the plugin
+     * @throws MojoExecutionException if there is a problem in the properties
+     */
     @AfterClass
     public static void testTestShardCleaner() throws MojoFailureException, MojoExecutionException {
         testShardCleanerMojo.execute();
@@ -93,6 +94,27 @@ public class TestShardUnitTest {
         }
     }
 
+    /**
+     * Tests the creator goal
+     *
+     * @throws MojoFailureException if something wrong with the dependencies or sources of a the plugin
+     * @throws MojoExecutionException if there is a problem in the properties
+     */
+    @Test
+    public void testTestShardCreator() throws MojoFailureException, MojoExecutionException {
+        testShardCreatorMojo.execute();
+        Assert.assertEquals(10, testShardCreatorMojo.getReader().getTestFilePaths().size());
+
+        File file = new File("test-shards");
+        Assert.assertTrue(file.isDirectory());
+        Assert.assertTrue(file.list((dir, name) -> name.startsWith("shard") && name.endsWith(".txt")).length == 5);
+    }
+
+    /**
+     * Test the test class file filter, whether it accepts/excludes the right files according to the maven file path pattern
+     *
+     * @throws IOException if an exception occurs
+     */
     @Test
     public void testTestClassFileFilter() throws IOException {
         String[] includes = new String[]{"**/*Test.java"};
