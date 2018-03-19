@@ -13,7 +13,7 @@ import org.apache.maven.project.MavenProject;
  *
  * @author Patrick Fischer patrick.fischer@qaware.de
  */
-abstract class AbstractTestShardMojo extends AbstractMojo {
+public abstract class AbstractShardMojo extends AbstractMojo {
 
     @Parameter(property = "tests.outputFolder", defaultValue = "${project.build.directory}/test-shards")
     protected String outputFolder;
@@ -29,5 +29,4 @@ abstract class AbstractTestShardMojo extends AbstractMojo {
     public String getTestSources() {
         return project.getBuild().getTestSourceDirectory();
     }
-
 }

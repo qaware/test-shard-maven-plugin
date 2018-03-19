@@ -4,6 +4,10 @@
 
 package com.telekom.gis.psa.test.shard.maven.plugin;
 
+import com.telekom.gis.psa.test.shard.maven.plugin.junit.JUnitShardCreatorMojo;
+import com.telekom.gis.psa.test.shard.maven.plugin.junit.JUnitShardIncludeMojo;
+import com.telekom.gis.psa.test.shard.maven.plugin.utils.ShardConstants;
+import com.telekom.gis.psa.test.shard.maven.plugin.utils.TestClassFileFilter;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
 import org.junit.AfterClass;
@@ -22,11 +26,11 @@ import java.util.Map;
  *
  * @author Patrick Fischer patrick.fischer@qaware.de
  */
-public class TestShardUnitTest {
+public class JUnitShardUnitTest {
 
     private static Map<String, Object> properties;
-    private static TestShardCreatorMojo testShardCreatorMojo;
-    private static TestShardIncludeMojo testShardIncludeMojo;
+    private static JUnitShardCreatorMojo testShardCreatorMojo;
+    private static JUnitShardIncludeMojo testShardIncludeMojo;
     private static TestShardCleanerMojo testShardCleanerMojo;
 
     /**
@@ -38,19 +42,19 @@ public class TestShardUnitTest {
     public static void loadProperties() throws Exception {
         properties = new HashMap<>();
 
-        properties.put("outputFolder", "test-shards");
+        properties.put("outputFolder", "target/test-shards");
 
         //Creator properties
         properties.put("shardCount", 5);
         properties.put("includes", new String[]{"**/*Test*.java"});
 
-        String testFolder = TestShardUnitTest.class.getClassLoader().getResource("testClasses").getFile();
+        String testFolder = JUnitShardUnitTest.class.getClassLoader().getResource("testClasses").getFile();
         testFolder = testFolder.replaceAll("%20", " ");
 
         properties.put("testFolders", new String[]{testFolder});
         properties.put("pathToPackage", "src\\test\\java");
 
-        testShardCreatorMojo = new TestShardCreatorMojo();
+        testShardCreatorMojo = new JUnitShardCreatorMojo();
         loadMojo(testShardCreatorMojo);
 
         testShardCleanerMojo = new TestShardCleanerMojo();
@@ -87,7 +91,7 @@ public class TestShardUnitTest {
     public static void testTestShardCleaner() throws MojoFailureException, MojoExecutionException {
         testShardCleanerMojo.execute();
 
-        File file = new File("test-shards");
+        File file = new File("target/test-shards");
         if (file.isDirectory()) {
             Assert.assertTrue(file.list((dir, name) -> name.startsWith("shard") && name.endsWith(".txt")).length == 0);
             Assert.assertTrue(file.delete());
@@ -105,9 +109,9 @@ public class TestShardUnitTest {
         testShardCreatorMojo.execute();
         Assert.assertEquals(10, testShardCreatorMojo.getReader().getTestFilePaths().size());
 
-        File file = new File("test-shards");
+        File file = new File("target/test-shards");
         Assert.assertTrue(file.isDirectory());
-        Assert.assertTrue(file.list((dir, name) -> name.startsWith("shard") && name.endsWith(".txt")).length == 5);
+        Assert.assertTrue(file.list((dir, name) -> name.matches(ShardConstants.JUNIT_SHARD_REGEX)).length == 5);
     }
 
     /**

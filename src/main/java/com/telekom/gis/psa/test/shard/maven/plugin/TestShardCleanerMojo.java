@@ -4,6 +4,7 @@
 
 package com.telekom.gis.psa.test.shard.maven.plugin;
 
+import com.telekom.gis.psa.test.shard.maven.plugin.utils.ShardConstants;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
 import org.apache.maven.plugins.annotations.Mojo;
@@ -16,7 +17,7 @@ import java.io.File;
  * @author Patrick Fischer patrick.fischer@qaware.de
  */
 @Mojo(name = "shard-clean")
-public class TestShardCleanerMojo extends AbstractTestShardMojo {
+public class TestShardCleanerMojo extends AbstractShardMojo {
 
     /**
      * The execution function for this goal.
@@ -31,11 +32,23 @@ public class TestShardCleanerMojo extends AbstractTestShardMojo {
             return;
         }
 
-        for (File file : folder.listFiles((dir, name) -> name.startsWith("shard") && name.endsWith(".txt"))) {
-            if(file.delete()){
+        File[] shardFiles = folder.listFiles(this::isShardFile);
+
+        if(shardFiles == null){
+            return;
+        }
+
+        for (File file : shardFiles) {
+            if(!file.delete()){
                 getLog().warn("Failed to delete test shard: " + file.getPath());
             }
         }
         getLog().info("Deleted all test shards");
+    }
+
+    private boolean isShardFile(File dir, String fileName) {
+        return  fileName.matches(ShardConstants.JUNIT_SHARD_REGEX) ||
+                fileName.matches(ShardConstants.CUCUMBER_SHARD_REGEX);
+
     }
 }

@@ -6,7 +6,6 @@ package com.telekom.gis.psa.test.shard.maven.plugin;
 
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
-import org.apache.maven.plugins.annotations.Mojo;
 import org.apache.maven.plugins.annotations.Parameter;
 
 import java.io.File;
@@ -19,14 +18,14 @@ import java.util.List;
  *
  * @author Patrick Fischer patrick.fischer@qaware.de
  */
-@Mojo(name = "shard-include")
-public class TestShardIncludeMojo extends AbstractTestShardMojo{
+public abstract class AbstractShardExecutorMojo extends AbstractShardMojo {
 
-    @Parameter(property = "tests.shardIndex", required = true)
+    @Parameter(property = "shard.execute.shardIndex", required = true)
     private int shardIndex;
 
     /**
-     * The execution function for this goal.
+     * The execution function for this goal. It checks the given shardIndex and executes just the shard with the given
+     * shard index
      *
      * @throws MojoFailureException if something wrong with the dependencies or sources of a the plugin
      * @throws MojoExecutionException if there is a problem in the properties
@@ -36,17 +35,16 @@ public class TestShardIncludeMojo extends AbstractTestShardMojo{
         List<String> testShardPath = getTestShards();
 
         if(shardIndex < 0 || shardIndex >= testShardPath.size()){
-            throw new MojoExecutionException("Invalid test number, (shard count: " + testShardPath.size() + "; index: " +
+            throw new MojoExecutionException("Invalid shard number, (shard count: " + testShardPath.size() + "; index: " +
                     shardIndex);
         }
 
-        project.getProperties().setProperty("surefire.includesFile", outputFolder + File.separator + testShardPath.get(shardIndex));
-        getLog().info("Added test shard \"" + testShardPath.get(shardIndex) + "\" to surefire.");
+        executeShard(testShardPath.get(shardIndex));
     }
 
     private List<String> getTestShards() throws MojoExecutionException {
         File file = new File(outputFolder);
-        String[] testShardArray = file.list();
+        String[] testShardArray = file.list((dir, name) -> name.matches(""));
         if(testShardArray == null || testShardArray.length == 0){
             throw new MojoExecutionException("No test shards found, shards must be created first.");
         }
@@ -54,4 +52,6 @@ public class TestShardIncludeMojo extends AbstractTestShardMojo{
         Collections.addAll(testShards, testShardArray);
         return testShards;
     }
+
+    public abstract void executeShard(String shardName) throws MojoExecutionException, MojoFailureException ;
 }

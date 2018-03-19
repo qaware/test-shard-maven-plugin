@@ -4,10 +4,11 @@
 
 package com.telekom.gis.psa.test.shard.maven.plugin;
 
+import com.telekom.gis.psa.test.shard.maven.plugin.utils.ShardFileWriter;
+import com.telekom.gis.psa.test.shard.maven.plugin.utils.TestClassFileFilter;
+import com.telekom.gis.psa.test.shard.maven.plugin.utils.TestFileReader;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
-import org.apache.maven.plugins.annotations.LifecyclePhase;
-import org.apache.maven.plugins.annotations.Mojo;
 import org.apache.maven.plugins.annotations.Parameter;
 
 import java.io.IOException;
@@ -19,50 +20,53 @@ import java.util.List;
  *
  * @author Patrick Fischer patrick.fischer@qaware.de
  */
-@Mojo(name = "shard-creator", defaultPhase = LifecyclePhase.PROCESS_TEST_SOURCES)
-public class TestShardCreatorMojo extends AbstractTestShardMojo {
+public abstract class AbstractShardCreatorMojo extends AbstractShardMojo {
 
     private ShardFileWriter writer;
     private TestFileReader reader;
 
-    @Parameter(property = "tests.shardCount", required = true)
-    private int shardCount;
+    @Parameter(property = "shard.create.shardCount", required = true)
+    protected int shardCount;
 
-    @Parameter(property = "tests.includes")
-    private String[] includes;
+    @Parameter(property = "shard.create.includes")
+    protected String[] includes;
 
-    @Parameter(property = "tests.excludes")
-    private String[] excludes;
+    @Parameter(property = "shard.create.excludes")
+    protected String[] excludes;
 
-    @Parameter(property = "tests.testFolders", defaultValue = "${project.build.testSourceDirectory}")
-    private String[] testFolders;
+    @Parameter(property = "shard.create.testFolders")
+    protected String[] testFolders;
 
-    @Parameter(property = "tests.pathToPackage", defaultValue = "java")
-    private String pathToPackage;
+    @Parameter(property = "shard.create.pathToPackage", defaultValue = "java")
+    protected String pathToPackage;
 
     /**
      * Default constructor, initializes a reader for the test classes and a writer for the test shards.
      */
-    public TestShardCreatorMojo() {
+    public AbstractShardCreatorMojo() {
         writer = new ShardFileWriter();
         reader = new TestFileReader();
     }
 
     /**
-     * The execution function for this goal.
+     * Creates the test shards.
+     * <p>
+     * <code>filename = shardNamePattern + index + ".txt"</code>
      *
-     * @throws MojoFailureException if something wrong with the dependencies or sources of a the plugin
+     * @param shardNamePattern the name of the created test shards, without the index;
+     * @throws MojoFailureException   if something wrong with the dependencies or sources of a the plugin
      * @throws MojoExecutionException if there is a problem in the properties
      */
-    @Override
-    public void execute() throws MojoExecutionException, MojoFailureException {
+    public void createShards(String shardNamePattern, TestClassFileFilter fileFilter) throws MojoExecutionException, MojoFailureException {
+        getLog().info("Start creation of " + shardNamePattern + " files.");
+
         writer.clear();
-        reader.setFilenameFilter(new TestClassFileFilter(includes, excludes));
-        
+        reader.setFilenameFilter(fileFilter);
+
         if (testFolders == null || testFolders.length == 0) {
             reader.read(getLog(), getTestSources());
         } else {
-            reader.read(getLog(), pathToPackage, testFolders);
+            reader.read(getLog(), testFolders);
         }
 
         List<String> testClassList = reader.getTestFilePaths();
@@ -85,13 +89,13 @@ public class TestShardCreatorMojo extends AbstractTestShardMojo {
         for (int testShardNumber = 0; testShardNumber < testClassesPerShard.size(); testShardNumber++) {
             String[] testClassArray = testClassesPerShard.get(testShardNumber);
             try {
-                String shardName = "shard" + testShardNumber + ".txt";
+                String shardName = shardNamePattern + testShardNumber + ".txt";
 
                 writer.openShardFile(shardName);
                 writer.addTestClass(testClassArray);
                 writer.saveAndClose();
             } catch (IOException e) {
-                throw new MojoFailureException("Failed to write test shard.", e);
+                throw new MojoFailureException("Failed to write " + shardNamePattern + ".", e);
             }
         }
     }
@@ -156,7 +160,7 @@ public class TestShardCreatorMojo extends AbstractTestShardMojo {
 
     /**
      * Getter for the test file reader
-     * 
+     *
      * @return the test file reader
      */
     public TestFileReader getReader() {

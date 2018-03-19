@@ -2,7 +2,7 @@
  * ﻿Copyright 2012, Deutsche Telekom AG, DTAG GHS GIS. All rights reserved.
  */
 
-package com.telekom.gis.psa.test.shard.maven.plugin;
+package com.telekom.gis.psa.test.shard.maven.plugin.utils;
 
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;

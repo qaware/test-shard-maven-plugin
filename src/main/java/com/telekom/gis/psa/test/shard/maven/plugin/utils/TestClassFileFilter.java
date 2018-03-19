@@ -2,7 +2,7 @@
  * ﻿Copyright 2012, Deutsche Telekom AG, DTAG GHS GIS. All rights reserved.
  */
 
-package com.telekom.gis.psa.test.shard.maven.plugin;
+package com.telekom.gis.psa.test.shard.maven.plugin.utils;
 
 import java.io.File;
 import java.io.FileFilter;
@@ -25,13 +25,12 @@ public class TestClassFileFilter implements FileFilter, FilenameFilter {
      * @param excludes list from the pom
      */
     public TestClassFileFilter(String[] includes, String[] excludes) {
-        if (includes == null || includes.length > 0) {
-            this.includes = includes;
-        }else{
-            this.includes = new String[]{ "**/*Test.java" };
-        }
-        if (excludes == null || excludes.length > 0) {
+        this.includes = includes;
+        
+        if (excludes != null && excludes.length > 0) {
             this.excludes = excludes;
+        }else{
+            this.excludes = new String[0];
         }
     }
 
@@ -56,8 +55,8 @@ public class TestClassFileFilter implements FileFilter, FilenameFilter {
     @Override
     public boolean accept(File dir, String name) {
         String dirPath = dir.getAbsolutePath().toLowerCase();
-        name = name.toLowerCase();
-        return !isExcluded(dirPath, name) && isIncluded(dirPath, name);
+        String lowerCaseName = name.toLowerCase();
+        return !isExcluded(dirPath, lowerCaseName) && isIncluded(dirPath, lowerCaseName);
     }
 
     private boolean isIncluded(String dirPath, String name) {
@@ -105,10 +104,7 @@ public class TestClassFileFilter implements FileFilter, FilenameFilter {
     }
 
     private boolean matchDirectoryPath(String dirPath, String pattern) {
-        if (pattern.equals("**")) {
-            return true;
-        }
-        return matchString(dirPath, pattern);
+        return pattern.equals("**") || matchString(dirPath, pattern);
     }
 
     private boolean matchString(String str, String pattern) {
