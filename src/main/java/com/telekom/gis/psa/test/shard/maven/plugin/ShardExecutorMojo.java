@@ -8,6 +8,7 @@ import com.telekom.gis.psa.test.shard.maven.plugin.cucumber.CucumberFeatureFileM
 import com.telekom.gis.psa.test.shard.maven.plugin.utils.ShardConstants;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
+import org.apache.maven.plugins.annotations.LifecyclePhase;
 import org.apache.maven.plugins.annotations.Mojo;
 import org.apache.maven.plugins.annotations.Parameter;
 
@@ -20,7 +21,7 @@ import java.util.List;
  *
  * @author Patrick Fischer patrick.fischer@qaware.de
  */
-@Mojo(name = "execute-shard")
+@Mojo(name = "execute-shard", defaultPhase = LifecyclePhase.PRE_INTEGRATION_TEST)
 public class ShardExecutorMojo extends AbstractShardMojo {
     
     @Parameter(property = "shard.execute.cucumberWrapperClass")

@@ -59,7 +59,7 @@ public abstract class AbstractShardCreatorMojo extends AbstractShardMojo {
 
         writer.clear();
         reader.setFilenameFilter(fileFilter);
-
+        
         if (testFolders == null || testFolders.length == 0) {
             reader.read(getLog(), getTestSources());
         } else {

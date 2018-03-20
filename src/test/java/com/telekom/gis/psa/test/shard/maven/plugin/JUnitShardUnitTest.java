@@ -21,15 +21,15 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
- * Unit test for test shard mojo, just tests for java exceptions and basic result
+ * Unit test for junit shard mojos, just tests for java exceptions and basic result
  *
  * @author Patrick Fischer patrick.fischer@qaware.de
  */
 public class JUnitShardUnitTest {
 
     private static Map<String, Object> properties;
-    private static JUnitShardCreatorMojo testShardCreatorMojo;
-    private static ShardCleanerMojo testShardCleanerMojo;
+    private static JUnitShardCreatorMojo jUnitShardCreatorMojo;
+    private static ShardCleanerMojo shardCleanerMojo;
 
     /**
      * Creates the needed mojos and loads the default properties.
@@ -52,13 +52,13 @@ public class JUnitShardUnitTest {
         properties.put("testFolders", new String[]{testFolder});
         properties.put("pathToPackage", "src\\test\\java");
 
-        testShardCreatorMojo = new JUnitShardCreatorMojo();
-        loadMojo(testShardCreatorMojo);
+        jUnitShardCreatorMojo = new JUnitShardCreatorMojo();
+        loadMojo(jUnitShardCreatorMojo);
 
-        testShardCleanerMojo = new ShardCleanerMojo();
-        loadMojo(testShardCleanerMojo);
+        shardCleanerMojo = new ShardCleanerMojo();
+        loadMojo(shardCleanerMojo);
 
-        testShardCleanerMojo.execute();
+        shardCleanerMojo.execute();
     }
 
     private static void loadMojo(Object mojo) throws Exception {
@@ -87,11 +87,11 @@ public class JUnitShardUnitTest {
      */
     @AfterClass
     public static void testTestShardCleaner() throws MojoFailureException, MojoExecutionException {
-        testShardCleanerMojo.execute();
+        shardCleanerMojo.execute();
 
         File file = new File("target/test-shards");
         if (file.isDirectory()) {
-            Assert.assertTrue(file.list((dir, name) -> name.startsWith("shard") && name.endsWith(".txt")).length == 0);
+            Assert.assertTrue(file.list((dir, name) ->  ShardConstants.isShardFile(name)).length == 0);
             Assert.assertTrue(file.delete());
         }
     }
@@ -104,8 +104,8 @@ public class JUnitShardUnitTest {
      */
     @Test
     public void testTestShardCreator() throws MojoFailureException, MojoExecutionException {
-        testShardCreatorMojo.execute();
-        Assert.assertEquals(10, testShardCreatorMojo.getReader().getTestFilePaths().size());
+        jUnitShardCreatorMojo.execute();
+        Assert.assertEquals(10, jUnitShardCreatorMojo.getReader().getTestFilePaths().size());
 
         File file = new File("target/test-shards");
         Assert.assertTrue(file.isDirectory());

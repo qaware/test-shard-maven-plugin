@@ -52,17 +52,26 @@ public final class CucumberFeatureFileManager {
         List<String> featureFiles = getAllFeatureFileOf(shard);
 
         for (String featureFileName : featureFiles) {
-            File featureFile = new File(featureFileName);
-            File disabledFeatureFile = new File(featureFile.getPath() + ".ignore");
-            if (disabledFeatureFile.exists()) {
-                throw new MojoExecutionException(
-                        "Failed to disable " + featureFile.getPath() + ": ignored feature already exists, " +
-                                "call the clean-cucumber-features goal to clean the feature files.");
-            }
+            disableFeatureFile(new File(featureFileName));
+        }
+    }
 
-            if (!featureFile.renameTo(disabledFeatureFile)) {
-                throw new MojoExecutionException("Failed to disable " + featureFile.getPath() + ": renaming failed.");
-            }
+    /**
+     * Disables a given feature file by appending .ignore to the file name
+     *
+     * @param featureFile the feature file
+     * @throws MojoExecutionException if an exception occurs
+     */
+    public static void disableFeatureFile(File featureFile) throws MojoExecutionException {
+        File disabledFeatureFile = new File(featureFile.getPath() + ".ignore");
+        if (disabledFeatureFile.exists()) {
+            throw new MojoExecutionException(
+                    "Failed to disable " + featureFile.getPath() + ": ignored feature already exists, " +
+                            "call the clean-cucumber-features goal to clean the feature files.");
+        }
+
+        if (!featureFile.renameTo(disabledFeatureFile)) {
+            throw new MojoExecutionException("Failed to disable " + featureFile.getPath() + ": renaming failed.");
         }
     }
 
