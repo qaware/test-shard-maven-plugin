@@ -5,7 +5,7 @@
 package com.telekom.gis.psa.test.shard.maven.plugin.utils;
 
 /**
- * TODO describe type.
+ * Some constants for test shards
  *
  * @author Patrick Fischer patrick.fischer@qaware.de
  */
@@ -49,4 +49,14 @@ public final class ShardConstants {
      */
     public static final String[] DEFAULT_JUNIT_INCLUDE = new String[]{"**/*Test.java"};
 
+    /**
+     * A file name filter, which tests the fileName against all shard regex constants.
+     *
+     * @param fileName the name of the file
+     * @return true if it matches any shard regex
+     */
+    public static boolean isShardFile(String fileName) {
+        return  fileName.matches(ShardConstants.JUNIT_SHARD_REGEX) ||
+                fileName.matches(ShardConstants.CUCUMBER_SHARD_REGEX);
+    }
 }

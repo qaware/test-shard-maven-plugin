@@ -7,6 +7,7 @@ package com.telekom.gis.psa.test.shard.maven.plugin.cucumber;
 import com.telekom.gis.psa.test.shard.maven.plugin.AbstractShardCreatorMojo;
 import com.telekom.gis.psa.test.shard.maven.plugin.utils.ShardConstants;
 import com.telekom.gis.psa.test.shard.maven.plugin.utils.TestClassFileFilter;
+import com.telekom.gis.psa.test.shard.maven.plugin.utils.TestFileReader;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
 import org.apache.maven.plugins.annotations.LifecyclePhase;
@@ -21,6 +22,14 @@ import org.apache.maven.plugins.annotations.Mojo;
 @Mojo(name = "create-cucumber-shards", defaultPhase = LifecyclePhase.PROCESS_TEST_SOURCES)
 public class CucumberShardCreatorMojo extends AbstractShardCreatorMojo {
 
+    private CucumberFileReader reader;
+
+    public CucumberShardCreatorMojo(){
+        super();
+
+        reader = new CucumberFileReader();
+    }
+
     @Override
     public void execute() throws MojoExecutionException, MojoFailureException {
         if(includes == null || includes.length == 0){
@@ -29,5 +38,10 @@ public class CucumberShardCreatorMojo extends AbstractShardCreatorMojo {
 
         TestClassFileFilter fileFilter = new TestClassFileFilter(includes, excludes);
         createShards(ShardConstants.CUCUMBER_SHARD_PREFIX, fileFilter);
+    }
+
+    @Override
+    public TestFileReader getReader() {
+        return reader;
     }
 }

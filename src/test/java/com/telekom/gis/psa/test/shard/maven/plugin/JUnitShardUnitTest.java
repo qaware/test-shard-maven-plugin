@@ -5,7 +5,6 @@
 package com.telekom.gis.psa.test.shard.maven.plugin;
 
 import com.telekom.gis.psa.test.shard.maven.plugin.junit.JUnitShardCreatorMojo;
-import com.telekom.gis.psa.test.shard.maven.plugin.junit.JUnitShardIncludeMojo;
 import com.telekom.gis.psa.test.shard.maven.plugin.utils.ShardConstants;
 import com.telekom.gis.psa.test.shard.maven.plugin.utils.TestClassFileFilter;
 import org.apache.maven.plugin.MojoExecutionException;
@@ -30,8 +29,7 @@ public class JUnitShardUnitTest {
 
     private static Map<String, Object> properties;
     private static JUnitShardCreatorMojo testShardCreatorMojo;
-    private static JUnitShardIncludeMojo testShardIncludeMojo;
-    private static TestShardCleanerMojo testShardCleanerMojo;
+    private static ShardCleanerMojo testShardCleanerMojo;
 
     /**
      * Creates the needed mojos and loads the default properties.
@@ -57,7 +55,7 @@ public class JUnitShardUnitTest {
         testShardCreatorMojo = new JUnitShardCreatorMojo();
         loadMojo(testShardCreatorMojo);
 
-        testShardCleanerMojo = new TestShardCleanerMojo();
+        testShardCleanerMojo = new ShardCleanerMojo();
         loadMojo(testShardCleanerMojo);
 
         testShardCleanerMojo.execute();

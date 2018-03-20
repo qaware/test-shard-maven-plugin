@@ -23,7 +23,6 @@ import java.util.List;
 public abstract class AbstractShardCreatorMojo extends AbstractShardMojo {
 
     private ShardFileWriter writer;
-    private TestFileReader reader;
 
     @Parameter(property = "shard.create.shardCount", required = true)
     protected int shardCount;
@@ -37,15 +36,11 @@ public abstract class AbstractShardCreatorMojo extends AbstractShardMojo {
     @Parameter(property = "shard.create.testFolders")
     protected String[] testFolders;
 
-    @Parameter(property = "shard.create.pathToPackage", defaultValue = "java")
-    protected String pathToPackage;
-
     /**
      * Default constructor, initializes a reader for the test classes and a writer for the test shards.
      */
     public AbstractShardCreatorMojo() {
         writer = new ShardFileWriter();
-        reader = new TestFileReader();
     }
 
     /**
@@ -59,6 +54,8 @@ public abstract class AbstractShardCreatorMojo extends AbstractShardMojo {
      */
     public void createShards(String shardNamePattern, TestClassFileFilter fileFilter) throws MojoExecutionException, MojoFailureException {
         getLog().info("Start creation of " + shardNamePattern + " files.");
+
+        TestFileReader reader = getReader();
 
         writer.clear();
         reader.setFilenameFilter(fileFilter);
@@ -163,7 +160,5 @@ public abstract class AbstractShardCreatorMojo extends AbstractShardMojo {
      *
      * @return the test file reader
      */
-    public TestFileReader getReader() {
-        return reader;
-    }
+    public abstract TestFileReader getReader();
 }

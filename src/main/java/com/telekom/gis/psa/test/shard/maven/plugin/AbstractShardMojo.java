@@ -15,7 +15,7 @@ import org.apache.maven.project.MavenProject;
  */
 public abstract class AbstractShardMojo extends AbstractMojo {
 
-    @Parameter(property = "tests.outputFolder", defaultValue = "${project.build.directory}/test-shards")
+    @Parameter(property = "shard.outputFolder", defaultValue = "${project.build.directory}/test-shards")
     protected String outputFolder;
 
     @Parameter(property = "project", readonly = true, defaultValue = "${project}")

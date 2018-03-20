@@ -73,13 +73,6 @@
             <scope>test</scope>
         </dependency>
 
-        <!-- Cucumber test execution -->
-        <dependency>
-            <groupId>io.cucumber</groupId>
-            <artifactId>cucumber-core</artifactId>
-            <version>RELEASE</version>
-        </dependency>
-
         <!-- Test dependencies -->
         <dependency>
             <groupId>junit</groupId>

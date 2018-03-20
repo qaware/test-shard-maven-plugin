@@ -17,8 +17,8 @@ import java.io.File;
  *
  * @author Patrick Fischer patrick.fischer@qaware.de
  */
-@Mojo(name = "shard-clean")
-public class TestShardCleanerMojo extends AbstractShardMojo {
+@Mojo(name = "clean-shards")
+public class ShardCleanerMojo extends AbstractShardMojo {
 
     /**
      * The execution function for this goal.
@@ -33,7 +33,7 @@ public class TestShardCleanerMojo extends AbstractShardMojo {
             return;
         }
 
-        File[] shardFiles = folder.listFiles(this::isShardFile);
+        File[] shardFiles = folder.listFiles(((dir, name) -> ShardConstants.isShardFile(name)));
 
         if(shardFiles == null){
             return;
@@ -45,11 +45,5 @@ public class TestShardCleanerMojo extends AbstractShardMojo {
             }
         }
         getLog().info("Deleted all test shards");
-    }
-
-    private boolean isShardFile(File dir, String fileName) {
-        return  fileName.matches(ShardConstants.JUNIT_SHARD_REGEX) ||
-                fileName.matches(ShardConstants.CUCUMBER_SHARD_REGEX);
-
     }
 }
