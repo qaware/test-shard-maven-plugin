@@ -1,11 +1,10 @@
 # Test Shard Maven Plugin
 
-The test shard maven plugin is a maven plugin to split tests into test shards (txt files). The main aim is to use these shards for concurrent testing. The plugin reads all test classes, splits them into a given amount of
-test shards in the the maven process-test-resources life-cycle phase. These shards can be included into surfire maven plugin by running the shard-include goal of this plugin. 
+The test shard maven plugin is a maven plugin to split tests into test shards (txt files). The main aim is to use these shards for concurrent testing.
 
 ## Getting started
 
-To include this plugin just add, it to the pom.xml of your project.
+To include this plugin just add, it to the pom.xml of your project
 ```
 <project>
 	...	
@@ -14,27 +13,18 @@ To include this plugin just add, it to the pom.xml of your project.
         <plugins>
 			...	
             <plugin>
+                <groupId>com.telekom.gis.psa</groupId>
                 <artifactId>test-shard-maven-plugin</artifactId>
+                <version>1.0-SNAPSHOT</version>
                 <executions>
                     <execution>
-                        <id>tests</id>
                         <goals>
-                            <goal>shard-creator</goal>
+                            <goal>[creator_goal]</goal>
                         </goals>
                     </execution>
                 </executions>
                 <configuration>
-                    <includes>
-                        <include>**/*Test.java</include>
-                    </includes>
-                    <excludes>
-                        <exclude>**/*NoTest.java</exclude>
-                    </excludes>
-                    <testFolders>
-                        <testFolder>#{basedir}/src/test/java</testFolder>
-                    </testFolders>
-                    <shardCount>5</shardCount>
-                    <outputFolder>target/test-shards</outputFolder>
+                    <shardCount>[shard_cound]</shardCount>
                 </configuration>
             </plugin>			
 			...
@@ -45,42 +35,90 @@ To include this plugin just add, it to the pom.xml of your project.
 </project>
 ```
 
+and replace [creator_goal] with either `create-junit-shards` or `create-cucumber-shards` and [shard_cound] with the
+expected number of created shard files.
+
 ## Goals and plugin options
 
-The plugin contains three goals: shard-creator, shard-include and shard-clean. Just the shard-creator goal in executed in the maven build process. The other two can be executed by the command line.
+The maven shard creator plugin can create shards for basic junit test classes and cucumber feature files.
+Make sure, that your project contains a cucumber junit wrapper class:
 
-### shard-creator
+```
+@RunWith(value = Cucumber.class)
+@CucumberOptions(
+     ...
+)
+public class PSACucumberItests {...}
+```
+
+The class should include all feature files.
+
+### clean-shards
+Default Phase: NONE
+
+This goal deletes all test shards in the output directory. It is not necessary to call this goal on maven clean,
+if the output folder is located in the target folder.
+```
+mvn com.telekom.gis.psa:test-shard-maven-plugin:clean-shards
+```
+
+### execute-shard
+Default Phase: PRE_INTEGRATION_TEST
+
+This goal executes a given test shard (gets the test shard by the given shardIndex) and includes it into surfire by setting the property surefire.includesFile to the shard name.
+Example command line call:
+```
+mvn com.telekom.gis.psa:test-shard-maven-plugin:execute-shard org.apache.maven.plugins:maven-surefire-plugin:test -Dtests.shardIndex=4
+```
+
+The shard index does not depend on the type of the test shard. For example, if you have 2 cucumber and 3 junit test shards, the expected outcome
+of the creator goals is:
+```
+- cucumber-shard0.txt
+- cucumber-shard1.txt
+- junit-shard0.txt
+- junit-shard1.txt
+- junit-shard2.txt
+``` 
+The index starts with 0 at `cucumber-shard0.txt`, continues with 2 at `junit-shard0.txt` and so on. So to execute
+`junit-shard1.txt`, you have to execute this goal with shardIndex 3. 
+
+
+### create-junit-shards
+Default Phase: PROCESS_TEST_SOURCES
 
 This goal reads the test sources, splits then and creates the test shards.
+For this goal test sources are supposed to be java files with junit tests
 Example command line call:
 ```
-mvn com.telekom.gis.psa:test-shard-maven-plugin:shard-creator -Dtests.shardCount=5
+mvn com.telekom.gis.psa:test-shard-maven-plugin:create-junit-shards -Dtests.shardCount=5
 ```
 
-### shard-include
+### create-cucumber-shards
+Default Phase: PROCESS_TEST_SOURCES
 
-This goal includes a given test shard (gets the test shard by the given shardIndex) and sets the surfire property surefire.includesFile.
+This goal reads the test sources, splits then and creates the test shards.
+For this goal test sources are supposed to be cucumber feature files.
 Example command line call:
 ```
-mvn com.telekom.gis.psa:test-shard-maven-plugin:shard-include org.apache.maven.plugins:maven-surefire-plugin:test -Dtests.shardIndex=4
+mvn com.telekom.gis.psa:test-shard-maven-plugin:create-junit-shards -Dtests.shardCount=5
 ```
 
-### shard-clean
+### clean-cucumber-features
+Default Phase: POST_INTEGRATION_TEST
 
-This goal deletes all test shards in the output directory.
-```
-mvn com.telekom.gis.psa:test-shard-maven-plugin:shard-clean
-```
+This goal removed the .ignore extension from the feature files. This extension is used to disable feature files.
 
-### plugin options
+### Plugin options
 
 If a parameter has no default value, it is required to set this parameter in the pom.xml of your project.
 
-Name | Parameter property | description | goal | example | default value
---- | --- | --- | --- | --- | ---
-outputFolder | tests.outputFolder | The output directory for the test shards | shard-creator, shard-include, shard-clean | `<outputFolder>target/test-shards</outputFolder>` | `${project.build.directory}/test-shards`
-shardCount | tests.shardCount | The amount of shards to be created | shard-creator | `<shardCount>5</shardCount>` |
-includes | tests.includes | The path pattern for the test files to be included | shard-creator | `<excludes><exclude>**/*Test.java</exclude></excludes>` | `**/*Test.java`
-excludes | tests.excludes | The path pattern for the test files to be excluded | shard-creator | `<excludes><exclude>**/*NoTest.java</exclude></excludes>` | []
-testFolders | tests.testFolders | The directories, where to search for the the test files, do not include parts of package names | shard-creator | `<testFolders><testFolder>src/test/java</testFolder></testFolders>` | `${project.build.testSourceDirectory}`
-shardIndex | tests.shardIndex | The index of the shard to be loaded into surfire (0 <= shardIndex < shardCount) | shard-include | `-Dtests.shardIndex=1` |
+Name | Parameter property | description | goal | default value
+--- | --- | --- | --- | ---
+cucumberWrapperClass | shard.execute.cucumberWrapperClass | The full class name (package and class name) of the wrapper class for cucumber tests | execute-shard | none, but only required if cucumber tests are executed 
+shardIndex | shard.execute.shardIndex | The index of the shard to be loaded into surfire (see goal description) | execute-shard | 
+outputFolder | shard.outputFolder | The output directory for the test shards | all | `${project.build.directory}/test-shards`
+shardCount | shard.create.shardCount | The amount of shards to be created (by each creator goal) | create-junit-shards, create-cucumber-shards |
+includes | shard.create.includes | The path pattern for the test files to be included | create-junit-shards, create-cucumber-shards | `{**/*Test.java}` for junit, `{**/*.feature}` for cucumber
+excludes | shard.create.excludes | The path pattern for the test files to be excluded | create-junit-shards, create-cucumber-shards | []
+testFolders | shard.create.testFolders | The directories, where to search for the the test files, do not include parts of package names | create-junit-shards, create-cucumber-shards, clean-cucumber-features | `${project.build.testSourceDirectory}`

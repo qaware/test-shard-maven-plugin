@@ -20,13 +20,4 @@ public abstract class AbstractShardMojo extends AbstractMojo {
 
     @Parameter(property = "project", readonly = true, defaultValue = "${project}")
     protected MavenProject project;
-
-    /**
-     * Gets the test source directory from the maven project
-     *
-     * @return the test source directory
-     */
-    public String getTestSources() {
-        return project.getBuild().getTestSourceDirectory();
-    }
 }

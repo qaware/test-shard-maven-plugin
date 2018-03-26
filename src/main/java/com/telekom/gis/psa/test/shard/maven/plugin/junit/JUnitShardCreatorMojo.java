@@ -23,7 +23,10 @@ import org.apache.maven.plugins.annotations.Mojo;
 public class JUnitShardCreatorMojo extends AbstractShardCreatorMojo {
 
     private JUnitFileReader reader;
-
+    
+    /**
+     * Default constructor, initializes necessary fields
+     */
     public JUnitShardCreatorMojo(){
         super();
 

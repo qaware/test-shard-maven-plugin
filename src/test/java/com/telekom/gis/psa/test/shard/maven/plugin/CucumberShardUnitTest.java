@@ -35,6 +35,11 @@ public class CucumberShardUnitTest {
 
     private static String testFolder;
 
+    /**
+     * Initializes all necessary fields and loads mojo instances
+     *
+     * @throws Exception if an exception occurs
+     */
     @BeforeClass
     public static void loadProperties() throws Exception {
         properties = new HashMap<>();
@@ -98,6 +103,12 @@ public class CucumberShardUnitTest {
         }
     }
 
+    /**
+     * Tests the shard creator mojo
+     * 
+     * @throws MojoFailureException   if something wrong with the dependencies or sources of a the plugin
+     * @throws MojoExecutionException if there is a problem in the properties
+     */
     @Test
     public void testShardCreator() throws MojoFailureException, MojoExecutionException {
         cucumberShardCreatorMojo.execute();
@@ -108,6 +119,12 @@ public class CucumberShardUnitTest {
         Assert.assertTrue(file.list((dir, name) -> name.matches(ShardConstants.CUCUMBER_SHARD_REGEX)).length == 2);
     }
 
+    /**
+     * Tests feature file disabling
+     *
+     * @throws MojoFailureException   if something wrong with the dependencies or sources of a the plugin
+     * @throws MojoExecutionException if there is a problem in the properties
+     */
     @Test
     public void testShardDisable() throws MojoExecutionException, MojoFailureException {
         File dummy1 = new File(testFolder, "DummyCucumber1.feature");

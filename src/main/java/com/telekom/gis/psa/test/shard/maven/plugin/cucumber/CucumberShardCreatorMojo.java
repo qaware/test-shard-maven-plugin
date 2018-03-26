@@ -24,6 +24,9 @@ public class CucumberShardCreatorMojo extends AbstractShardCreatorMojo {
 
     private CucumberFileReader reader;
 
+    /**
+     * Default constructor, initializes necessary fields
+     */
     public CucumberShardCreatorMojo(){
         super();
 

@@ -29,7 +29,7 @@ public interface TestFileReader {
      * Return all found test file paths. {@link TestFileReader#read(Log, String...)} must be invoked first, otherwise it
      * will always return an empty list
      *
-     * @return a list with test file paths ([package].[file]) without file ending
+     * @return a list with test file paths
      */
     List<String> getTestFilePaths();
 

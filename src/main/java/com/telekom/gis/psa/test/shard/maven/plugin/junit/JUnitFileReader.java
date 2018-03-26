@@ -23,7 +23,7 @@ public class JUnitFileReader implements TestFileReader {
     private FilenameFilter filenameFilter;
 
     /**
-     * Default constructor, initializes some not nullable fields
+     * Default constructor, initializes necessary fields
      */
     public JUnitFileReader() {
         this.testFilePaths = new ArrayList<>();
@@ -84,15 +84,13 @@ public class JUnitFileReader implements TestFileReader {
      *
      * @return a list with test file paths ([package].[file]) without file ending
      */
+    @Override
     public List<String> getTestFilePaths() {
         return testFilePaths;
     }
 
-    /**
-     * Setter for the file name filter
-     *
-     * @param filenameFilter a file name filter
-     */
+
+    @Override
     public void setFilenameFilter(FilenameFilter filenameFilter) {
         this.filenameFilter = filenameFilter;
     }

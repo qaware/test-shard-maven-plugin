@@ -33,11 +33,11 @@ public abstract class AbstractShardCreatorMojo extends AbstractShardMojo {
     @Parameter(property = "shard.create.excludes")
     protected String[] excludes;
 
-    @Parameter(property = "shard.create.testFolders")
+    @Parameter(property = "shard.create.testFolders", defaultValue = "${project.build.testSourceDirectory}")
     protected String[] testFolders;
 
     /**
-     * Default constructor, initializes a reader for the test classes and a writer for the test shards.
+     * Default constructor, initializes necessary fields
      */
     public AbstractShardCreatorMojo() {
         writer = new ShardFileWriter();
@@ -61,7 +61,7 @@ public abstract class AbstractShardCreatorMojo extends AbstractShardMojo {
         reader.setFilenameFilter(fileFilter);
         
         if (testFolders == null || testFolders.length == 0) {
-            reader.read(getLog(), getTestSources());
+            throw new MojoExecutionException("Failed to load test classes, no test folder is assigned.");
         } else {
             reader.read(getLog(), testFolders);
         }

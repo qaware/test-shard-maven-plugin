@@ -42,7 +42,7 @@ public class CucumberFileReader implements TestFileReader {
             testFilePaths.add(file.getPath());
         }
     }
-
+    
     @Override
     public List<String> getTestFilePaths() {
         return testFilePaths;

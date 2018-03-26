@@ -49,7 +49,7 @@ public final class CucumberFeatureFileManager {
     }
 
     private static void disableAllFeaturesOf(File shard) throws MojoExecutionException {
-        List<String> featureFiles = getAllFeatureFileOf(shard);
+        List<String> featureFiles = getAllFeatureFilesOf(shard);
 
         for (String featureFileName : featureFiles) {
             disableFeatureFile(new File(featureFileName));
@@ -82,7 +82,7 @@ public final class CucumberFeatureFileManager {
      * @return the list of the feature files
      * @throws MojoExecutionException if there is a problem in the properties
      */
-    public static List<String> getAllFeatureFileOf(File shard) throws MojoExecutionException {
+    public static List<String> getAllFeatureFilesOf(File shard) throws MojoExecutionException {
         List<String> features = new ArrayList<>();
         BufferedReader reader = null;
         try {

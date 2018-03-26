@@ -9,7 +9,7 @@ import java.io.FileFilter;
 import java.io.FilenameFilter;
 
 /**
- * The test class file filter
+ * The test class file filter, used to match file names against given maven styled include/exclude paths
  *
  * @author Patrick Fischer patrick.fischer@qaware.de
  */
