@@ -107,7 +107,7 @@ mvn com.telekom.gis.psa:test-shard-maven-plugin:create-junit-shards -Dtests.shar
 ### clean-cucumber-features
 Default Phase: POST_INTEGRATION_TEST
 
-This goal removed the .ignore extension from the feature files. This extension is used to disable feature files.
+This goal removes the .ignore extension from the feature files. This extension is used to disable feature files.
 
 ### Plugin options
 
