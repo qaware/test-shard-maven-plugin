@@ -4,7 +4,7 @@ The test shard maven plugin is a maven plugin to split tests into test shards (t
 
 ## Getting started
 
-To include this plugin just add, it to the pom.xml of your project
+To include this plugin just add the following code snippet to the pom.xml of your project
 ```
 <project>
 	...	
@@ -87,7 +87,7 @@ The index starts with 0 at `cucumber-shard0.txt`, continues with 2 at `junit-sha
 ### create-junit-shards
 Default Phase: PROCESS_TEST_SOURCES
 
-This goal reads the test sources, splits then and creates the test shards.
+This goal reads the test sources, splits them and creates the test shards.
 For this goal test sources are supposed to be java files with junit tests
 Example command line call:
 ```
@@ -97,7 +97,7 @@ mvn com.telekom.gis.psa:test-shard-maven-plugin:create-junit-shards -Dtests.shar
 ### create-cucumber-shards
 Default Phase: PROCESS_TEST_SOURCES
 
-This goal reads the test sources, splits then and creates the test shards.
+This goal reads the test sources, splits them and creates the test shards.
 For this goal test sources are supposed to be cucumber feature files.
 Example command line call:
 ```
