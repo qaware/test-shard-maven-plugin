@@ -61,7 +61,9 @@ public class ShardExecutorMojo extends AbstractShardMojo {
             project.getProperties().setProperty("surefire.argLine",
                     "@{-Dcucumber.options=\"--plugin junit:target/failsafe-reports/TEST-" + cucumberWrapperClass + Integer.toString(shardIndex) + ".xml\"}");
         }else if(shardName.matches(ShardConstants.JUNIT_SHARD_REGEX)){
-            project.getProperties().setProperty("surefire.includesFile", outputFolder + File.separator + shardName);
+            String includesFile = outputFolder + File.separator + shardName;
+            project.getProperties().setProperty("surefire.includesFile", includesFile);
+            project.getProperties().setProperty("failsafe.includesFile", includesFile);
         }else{
             getLog().warn(shardName + " does not match any shard regex, the file will be ignored");
             return;
