@@ -57,9 +57,15 @@ public class ShardExecutorMojo extends AbstractShardMojo {
                     " property <cucumberWrapperClass>");
             }
 
-            project.getProperties().setProperty("surefire.includes", cucumberWrapperClass);
-            project.getProperties().setProperty("surefire.argLine",
-                    "@{-Dcucumber.options=\"--plugin junit:target/failsafe-reports/TEST-" + cucumberWrapperClass + Integer.toString(shardIndex) + ".xml\"}");
+            project.getProperties().setProperty("test", cucumberWrapperClass);
+            project.getProperties().setProperty("it.test", cucumberWrapperClass);
+
+            String argLine = project.getProperties().getProperty("argLine");
+            if(argLine == null){
+                argLine = "";
+            }
+            argLine += "@{-Dcucumber.options=\"--plugin junit:target/failsafe-reports/TEST-" + cucumberWrapperClass + Integer.toString(shardIndex) + ".xml\"}";
+            project.getProperties().setProperty("argLine", argLine);
         }else if(shardName.matches(ShardConstants.JUNIT_SHARD_REGEX)){
             String includesFile = outputFolder + File.separator + shardName;
             project.getProperties().setProperty("surefire.includesFile", includesFile);
