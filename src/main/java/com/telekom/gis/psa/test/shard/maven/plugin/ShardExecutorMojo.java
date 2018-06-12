@@ -64,7 +64,7 @@ public class ShardExecutorMojo extends AbstractShardMojo {
             if(argLine == null){
                 argLine = "";
             }
-            argLine += "@{-Dcucumber.options=\"--plugin junit:target/failsafe-reports/TEST-" + cucumberWrapperClass + Integer.toString(shardIndex) + ".xml\"}";
+            argLine += " -Dcucumber.options=\"-plugin junit:target/failsafe-reports/TEST-" + cucumberWrapperClass + Integer.toString(shardIndex) + ".xml\"";
             project.getProperties().setProperty("argLine", argLine);
         }else if(shardName.matches(ShardConstants.JUNIT_SHARD_REGEX)){
             String includesFile = outputFolder + File.separator + shardName;
