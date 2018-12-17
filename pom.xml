@@ -11,6 +11,10 @@
     <name>Test Shard Maven Plugin</name>
     <packaging>maven-plugin</packaging>
 
+    <properties>
+        <argLine>-Djdk.net.URLClassPath.disableClassPathURLCheck=true -Dfile.encoding=UTF-8</argLine>
+    </properties>
+
     <build>
         <plugins>
             <plugin>
