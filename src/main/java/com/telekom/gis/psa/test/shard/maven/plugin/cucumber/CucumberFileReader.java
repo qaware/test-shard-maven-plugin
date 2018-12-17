@@ -29,14 +29,13 @@ public class CucumberFileReader implements TestFileReader {
 
     @Override
     public void read(Log log, String... testFolderPaths) {
-        for(String fileName : testFolderPaths){
-            addFile(new File(fileName));
-        }
+        Arrays.stream(testFolderPaths).map(File::new).sorted().forEach(this::addFile);
     }
 
     private void addFile(File file) {
         if(file.isDirectory()){
             Arrays.stream(file.listFiles((dir, name) -> filenameFilter.accept(dir, name) || new File(dir, name).isDirectory()))
+                    .sorted()
                     .forEach(this::addFile);
         }else if(filenameFilter.accept(file.getParentFile(), file.getName())){
             testFilePaths.add(file.getPath());

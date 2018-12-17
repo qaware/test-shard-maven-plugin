@@ -10,6 +10,7 @@ import org.apache.maven.plugin.logging.Log;
 import java.io.File;
 import java.io.FilenameFilter;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 /**
@@ -37,14 +38,18 @@ public class JUnitFileReader implements TestFileReader {
      * @param testFolderPaths the test folders
      */
     public void read(Log log, String... testFolderPaths) {
+        List<File> validFolders = new ArrayList<>();
         for (String testFolderPath : testFolderPaths) {
             File fileFolder = new File(testFolderPath);
             if (!fileFolder.exists() || !fileFolder.isDirectory()) {
                 log.warn("Invalid test folder: " + fileFolder.getAbsolutePath());
                 continue;
             }
-            addFilesIn(fileFolder, null);
+            validFolders.add(fileFolder);
+
         }
+        validFolders.stream().sorted().forEach(f -> addFilesIn(f, null));
+
     }
 
     private void addFilesIn(final File dir, String currentPackage) {
@@ -55,6 +60,7 @@ public class JUnitFileReader implements TestFileReader {
             return;
         }
 
+        Arrays.sort(subFolderArray);
         String previousPackage;
         if (currentPackage == null) {
             previousPackage = "";

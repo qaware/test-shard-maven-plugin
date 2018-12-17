@@ -83,7 +83,7 @@ public class ShardExecutorMojo extends AbstractShardMojo {
         if(testShardArray == null || testShardArray.length == 0){
             throw new MojoExecutionException("No test shards found, shards must be created first.");
         }
-
+        Arrays.sort(testShardArray);
         return Arrays.asList(testShardArray);
     }
 }
