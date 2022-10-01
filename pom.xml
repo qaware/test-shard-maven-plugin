@@ -6,7 +6,7 @@
 
     <groupId>com.telekom.gis.psa</groupId>
     <artifactId>test-shard-maven-plugin</artifactId>
-    <version>1.2-SNAPSHOT</version>
+    <version>1.2</version>
 
     <name>Test Shard Maven Plugin</name>
     <packaging>maven-plugin</packaging>
