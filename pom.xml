@@ -13,6 +13,7 @@
 
     <properties>
         <argLine>-Djdk.net.URLClassPath.disableClassPathURLCheck=true -Dfile.encoding=UTF-8</argLine>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     </properties>
 
     <build>
