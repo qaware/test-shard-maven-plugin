@@ -45,6 +45,14 @@
                 </executions>
             </plugin>
         </plugins>
+        <extensions>
+            <!-- Wagon provided by Google Cloud, to access artifact registry. It uses a login session from the environment. -->
+            <extension>
+                <groupId>com.google.cloud.artifactregistry</groupId>
+                <artifactId>artifactregistry-maven-wagon</artifactId>
+                <version>2.1.5</version>
+            </extension>
+        </extensions>
     </build>
 
     <dependencies>
@@ -89,14 +97,14 @@
     </dependencies>
 
     <distributionManagement>
-         <repository>
-             <id>qaware-maven-release</id>
-             <url>https://artifactory.qaware.de:443/artifactory/qaware-maven-release</url>
-         </repository>
-         <snapshotRepository>
-             <id>qaware-maven-snapshot</id>
-             <url>https://artifactory.qaware.de:443/artifactory/qaware-maven-snapshot</url>
-         </snapshotRepository>
+        <repository>
+            <id>dtag-psap-maven-release</id>
+            <url>artifactregistry://europe-west3-maven.pkg.dev/dtag-sec-build-infra/dtag-psap-maven-release</url>
+        </repository>
+        <snapshotRepository>
+            <id>dtag-psap-maven-snapshot</id>
+            <url>artifactregistry://europe-west3-maven.pkg.dev/dtag-sec-build-infra/dtag-psap-maven-snapshot</url>
+        </snapshotRepository>
      </distributionManagement>
 
 </project>
