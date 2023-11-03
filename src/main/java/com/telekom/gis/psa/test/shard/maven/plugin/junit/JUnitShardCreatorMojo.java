@@ -13,6 +13,13 @@ import org.apache.maven.plugin.MojoFailureException;
 import org.apache.maven.plugins.annotations.LifecyclePhase;
 import org.apache.maven.plugins.annotations.Mojo;
 
+import java.util.List;
+import java.util.Map;
+import java.util.function.Function;
+
+import static java.util.function.Function.identity;
+import static java.util.stream.Collectors.toMap;
+
 /**
  * The "create-junit-shards" goal handles the input an creates test shards for junit tests.
  * These shards are called "junit-shardXX.txt"
@@ -46,5 +53,11 @@ public class JUnitShardCreatorMojo extends AbstractShardCreatorMojo {
     @Override
     public TestFileReader getReader() {
         return reader;
+    }
+
+    @Override
+    public Map<String, String> getMapping(List<String> testClassList) {
+        return testClassList.stream()
+                .collect(toMap(identity(), identity()));
     }
 }
