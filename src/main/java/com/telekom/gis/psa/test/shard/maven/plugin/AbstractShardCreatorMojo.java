@@ -4,32 +4,16 @@
 
 package com.telekom.gis.psa.test.shard.maven.plugin;
 
-import com.telekom.gis.psa.test.shard.maven.plugin.junit.JUnitFileReader;
 import com.telekom.gis.psa.test.shard.maven.plugin.utils.ShardFileWriter;
 import com.telekom.gis.psa.test.shard.maven.plugin.utils.TestClassFileFilter;
 import com.telekom.gis.psa.test.shard.maven.plugin.utils.TestFileReader;
-import com.telekom.gis.psa.test.shard.maven.plugin.utils.distribution.EqualExecutionTimeDistributor;
-import com.telekom.gis.psa.test.shard.maven.plugin.utils.distribution.SimpleDistributor;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
 import org.apache.maven.plugins.annotations.Parameter;
-import org.w3c.dom.Document;
-import org.w3c.dom.NamedNodeMap;
-import org.w3c.dom.NodeList;
-import org.xml.sax.SAXException;
 
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
-import javax.xml.parsers.ParserConfigurationException;
-import javax.xml.xpath.*;
-import java.io.FileInputStream;
 import java.io.IOException;
-import java.util.HashMap;
+import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
-import java.util.regex.Pattern;
-
-import static java.util.Collections.emptyMap;
 
 /**
  * The creator mojo, reads the test files and created the shard files
@@ -38,7 +22,7 @@ import static java.util.Collections.emptyMap;
  */
 public abstract class AbstractShardCreatorMojo extends AbstractShardMojo {
 
-    private final ShardFileWriter writer;
+    private ShardFileWriter writer;
 
     @Parameter(property = "shard.create.shardCount", required = true)
     protected int shardCount;
@@ -52,13 +36,10 @@ public abstract class AbstractShardCreatorMojo extends AbstractShardMojo {
     @Parameter(property = "shard.create.testFolders", defaultValue = "${project.build.testSourceDirectory}")
     protected String[] testFolders;
 
-    @Parameter(property = "shard.create.testReportDirectory", required = false)
-    protected String testReportDirectory;
-
     /**
      * Default constructor, initializes necessary fields
      */
-    protected AbstractShardCreatorMojo() {
+    public AbstractShardCreatorMojo() {
         writer = new ShardFileWriter();
     }
 
@@ -78,7 +59,7 @@ public abstract class AbstractShardCreatorMojo extends AbstractShardMojo {
 
         writer.clear();
         reader.setFilenameFilter(fileFilter);
-
+        
         if (testFolders == null || testFolders.length == 0) {
             throw new MojoExecutionException("Failed to load test classes, no test folder is assigned.");
         } else {
@@ -87,22 +68,28 @@ public abstract class AbstractShardCreatorMojo extends AbstractShardMojo {
 
         List<String> testClassList = reader.getTestFilePaths();
         if (testClassList.isEmpty()) {
-            throw new MojoExecutionException("Failed to load test classes, or no tests classes found.");
+            throw new MojoExecutionException("Failed to load test classes, no classes found.");
         }
         getLog().info("Test files loaded, found " + testClassList.size() + " test(s) to split into " +
                 shardCount + " test shard(s)");
 
-        List<List<String>> testClassesPerShard = getTestDistribution(testClassList);
+        //Calculate average test shard size (count of test files per shard). Added 1 or 0 to make sure,
+        //that testShardSize * shardCount >= testClassList.size and all test can be added
+        int testShardSize = (testClassList.size() / shardCount) + Math.min(testClassList.size() % shardCount, 1);
+        List<String[]> testClassesPerShard = splitList(testClassList, testShardSize);
+
+        getLog().info(
+                "Creating " + testClassesPerShard.size() + " test shard(s) with an max size of " + testShardSize);
 
         writer.createOutputFolder(outputFolder);
 
         for (int testShardNumber = 0; testShardNumber < testClassesPerShard.size(); testShardNumber++) {
-            List<String> testClassArray = testClassesPerShard.get(testShardNumber);
+            String[] testClassArray = testClassesPerShard.get(testShardNumber);
             try {
                 String shardName = shardNamePattern + testShardNumber + ".txt";
 
                 writer.openShardFile(shardName);
-                writer.addTestClass(testClassArray.toArray(new String[0]));
+                writer.addTestClass(testClassArray);
                 writer.saveAndClose();
             } catch (IOException e) {
                 throw new MojoFailureException("Failed to write " + shardNamePattern + ".", e);
@@ -110,16 +97,62 @@ public abstract class AbstractShardCreatorMojo extends AbstractShardMojo {
         }
     }
 
-    private List<List<String>> getTestDistribution(List<String> testClassList) throws MojoExecutionException {
-        Map<String, Long> durationMap = processFailsafeReportFiles(testClassList);
-        getLog().info("Found " + durationMap.size() + " tests in test report files");
-        if(durationMap.isEmpty()) {
-            getLog().info("Using simple test distribution");
-            return new SimpleDistributor(getLog()).distribute(testClassList, shardCount);
-        } else {
-            getLog().info("Using optimized execution time test distribution");
-            return new EqualExecutionTimeDistributor(durationMap, getLog()).distribute(testClassList, shardCount);
+    private List<String[]> splitList(List<String> elements, int elementCount) throws MojoExecutionException {
+        List<String[]> splitList = new ArrayList<>();
+        if (elementCount == 0) {
+            return splitList;
         }
+        int addedCount = 0;
+        while (addedCount + elementCount <= elements.size()) {
+            int size = Math.min(elements.size() - addedCount, elementCount);
+            String[] elementArray = new String[size];
+            for (int i = 0; i < size; i++) {
+                elementArray[i] = elements.get(addedCount + i);
+            }
+            splitList.add(elementArray);
+            addedCount += size;
+        }
+
+        //Add the rest
+        if (elements.size() - addedCount > 0) {
+            String[] elementArray = new String[elements.size() - addedCount];
+            for (int i = 0; i < elementArray.length; i++) {
+                elementArray[i] = elements.get(addedCount + i);
+            }
+
+            splitList.add(elementArray);
+        }
+
+        //Adjust test shards to the configured test shard count
+        if (splitList.size() < shardCount) {
+            if (elementCount == 1) {
+                throw new MojoExecutionException(
+                        "Failed to create " + shardCount + " shard(s), there are not enough test classes to split.");
+            }
+            int diff = shardCount - splitList.size();
+            for (int i = 0; i < diff; i++) {
+                adjustSplitList(splitList, i);
+            }
+        }
+
+        return splitList;
+    }
+
+    private void adjustSplitList(List<String[]> splitList, int i) {
+        String[] elementArray = splitList.get(i);
+        int div = elementArray.length / 2;
+        int mod = elementArray.length % 2;
+        String[] part0 = new String[div + mod];
+        String[] part1 = new String[div];
+        for (int j = 0; j < elementArray.length; j++) {
+            if (j < part0.length) {
+                part0[j] = elementArray[j];
+            } else {
+                part1[j - part0.length] = elementArray[j];
+            }
+        }
+        splitList.set(i, part0);
+        splitList.add(part1);
     }
 
     /**
@@ -128,76 +161,4 @@ public abstract class AbstractShardCreatorMojo extends AbstractShardMojo {
      * @return the test file reader
      */
     public abstract TestFileReader getReader();
-
-    public abstract Map<String, String> getMapping(List<String> testClassList);
-
-    private Map<String, Long> processFailsafeReportFiles(List<String> testClassList) throws MojoExecutionException {
-        if (testReportDirectory == null) {
-            getLog().info("No test report directory configured.");
-            return emptyMap();
-        }
-        try {
-            XPath xPath = XPathFactory.newInstance().newXPath();
-            DocumentBuilderFactory builderFactory = DocumentBuilderFactory.newInstance();
-            DocumentBuilder builder = builderFactory.newDocumentBuilder();
-
-            XPathExpression testExpr = xPath.compile("/testsuite/testcase");
-
-            List<String> reportFiles = getFailsafeReportFiles(testReportDirectory);
-            getLog().info("Processing report files in " + testReportDirectory);
-
-            Map<String, String> mapping = getMapping(testClassList);
-
-            Map<String, Long> result = new HashMap<>();
-            for (String reportFile : reportFiles) {
-                getLog().info("Processing junit report file '" + reportFile + ".xml");
-                String fullReportFile = testReportDirectory + "/" + reportFile + ".xml";
-                try (FileInputStream fileIS = new FileInputStream(fullReportFile)) {
-                    Document xmlDocument = builder.parse(fileIS);
-                    NodeList tests = (NodeList) testExpr.evaluate(xmlDocument, XPathConstants.NODESET);
-                    if (tests.getLength() == 0) {
-                        getLog().info("Ignored entry " + fullReportFile);
-                        continue;
-                    }
-                    Map<String, Long> fileMap = getFileMap(tests, mapping);
-                    result.putAll(fileMap);
-                }
-            }
-            return result;
-        } catch (XPathExpressionException | IOException | SAXException | ParserConfigurationException e) {
-            getLog().error(e);
-            throw new MojoExecutionException("Could not process report file", e);
-        }
-    }
-
-    private Map<String, Long> getFileMap(NodeList tests, Map<String, String> mapping) {
-        Map<String, Long> result = new HashMap<>();
-        getLog().info("Found " + tests.getLength() + " tests");
-        for (int i = 0; i < tests.getLength(); i++) {
-            NamedNodeMap attributes = tests.item(i).getAttributes();
-            String className =  mapping.get(attributes.getNamedItem("classname").getTextContent());
-            if (className != null) {
-                Long duration = (long)(1000 * Double.parseDouble(attributes.getNamedItem("time").getTextContent()));
-                result.compute(className, (k, v) -> v != null ? v + duration : duration);
-            }
-        }
-        getLog().info("xxx:" + result);
-        return result;
-    }
-
-    private final Pattern reportFilePattern = Pattern.compile("^TEST-.+\\.xml$");
-
-    private List<String> getFailsafeReportFiles(String directory) {
-        JUnitFileReader reader = new JUnitFileReader();
-        reader.setFilenameFilter((dir, name) -> reportFilePattern.matcher(name).matches());
-        reader.read(getLog(), directory);
-        List<String> testFilePaths = reader.getTestFilePaths();
-        if(testFilePaths.isEmpty()) {
-            getLog().warn("Could not find any failsafe report files in directory '" + directory + "'");
-        } else {
-            getLog().info("Found the following failsafe report files in directory '" + directory + "'");
-            getLog().info("" + testFilePaths);
-        }
-        return testFilePaths;
-    }
 }
